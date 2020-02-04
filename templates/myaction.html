@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Processed video</title>
+    </head>
+    <body>
+        <video width="320" height="240" controls>
+            <source src="media/{{ value }}" type="video/mp4" />
+            {% if annotate == 'true' %}
+                <track kind="metadata" src="media/metadata.vtt" type="text/vtt" default>
+            {% endif %}
+
+            Your browser does not support the video tag!
+        </video>
+        {% if annotate == 'true' %}
+            <p id="par"></p>
+            <ul id="cars">
+            </ul>
+            <script>
+                let video = document.querySelector('video');
+                var paragraph = document.getElementById("par");
+                var list = document.getElementById("cars");
+                video.addEventListener('loadedmetadata', event => {
+                    let trackElem = document.querySelector("track");
+                    let track = trackElem.track;
+            
+                    track.mode = "showing";
+            
+                    console.log(track.cues);
+                    let cues = track.cues;
+                    console.log(cues);
+                    for (let index=0; index < cues.length; index++) {
+                        let cue = cues[index];
+                        
+                        
+                        console.log(cue);
+                        cue.pauseOnExit = true;
+                    };
+
+                    track.oncuechange = function () {
+                        let cues = track.activeCues;
+                        for (let index=0; index < cues.length; index++){
+                            paragraph.innerHTML = cues[index].text + " km/h";
+                        }
+                        if (cues.length == 0){
+                            paragraph.innerHTML = "";
+                        }
+                    }
+                });
+        
+            </script>
+        {% endif %}
+        <p><a href="media/{{ value }}">Download output video</a></p>
+    </body>
+</html>
